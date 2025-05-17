@@ -32,11 +32,14 @@ modeSelectorTemplate.innerHTML = /* HTML */ `
       padding: 0;
       cursor: pointer;
       background: none;
-
       border-radius: 0.5em;
       border-width: 0.1em;
       border-style: solid;
       border-color: currentColor;
+    }
+
+    #mode-selector-button {
+      padding-inline: 0.5em;
     }
 
     dialog {
@@ -79,6 +82,10 @@ modeSelectorTemplate.innerHTML = /* HTML */ `
       margin-top: 0.5em;
       padding: 0.3em;
       border-top: 1px solid #eee;
+    }
+
+    .hidden {
+      display: none;
     }
   </style>
 
@@ -249,8 +256,8 @@ class ModeSelector extends HTMLElement {
   }
 
   #updateModeSelectorButtonText() {
-    this.#modeSelectorButton!.textContent = this.#selectedModeName
-      ? this.#selectedModeName
+    this.#modeSelectorButton!.textContent = this.#selectedModeData
+      ? this.#selectedModeData.primaryName
       : "Select Mode";
   }
 
