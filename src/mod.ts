@@ -1,25 +1,25 @@
 /**
- * A custom HTML element that allows users to select a musical mode.
+ * A custom HTML element that allows users to select a musical note sequence.
  *
  * Features:
  * - Displays a button that, when clicked, opens a dialog.
- * - The dialog shows all diatonic modes.
- * - Supports toggling "more info" for each mode.
- * - Dispatches a custom event ('mode-selected') when a mode is selected.
- * - Exposes 'selectedModeName' and 'selectedModeData' properties.
- * - Supports setting the selected mode via the 'selected-mode-name' attribute.
+ * - The dialog shows all available note sequences.
+ * - Supports toggling "more info" for each note sequence.
+ * - Dispatches a custom event ('note-sequence-selected') when a note sequence is selected.
+ * - Exposes 'selectedNoteSequenceThemeKey' and 'selectedNoteSequenceTheme' properties.
+ * - Supports setting the selected note sequence via the 'selected-note-sequence-theme-key' attribute.
  *
- * @module mode-selector
+ * @module
  */
 
 import {
-  type DiatonicModeName,
-  diatonicModes,
+  allNoteSequenceThemes,
+  type NoteSequenceThemeKey,
   type NoteSequenceTheme,
 } from "@musodojo/music-theory-data";
 
-const modeSelectorTemplate = document.createElement("template");
-modeSelectorTemplate.innerHTML = /* HTML */ `
+const noteSequenceSelectorTemplate = document.createElement("template");
+noteSequenceSelectorTemplate.innerHTML = /* HTML */ `
   <style>
     :host {
       display: inline-block;
@@ -38,12 +38,12 @@ modeSelectorTemplate.innerHTML = /* HTML */ `
       border-color: currentColor;
     }
 
-    #mode-selector-button {
+    #note-sequence-selector-button {
       padding-inline: 0.5em;
     }
 
     dialog {
-      padding: 0.5em;
+      padding: 0em 0.2em 0.2em;
     }
 
     dialog::backdrop {
@@ -52,36 +52,33 @@ modeSelectorTemplate.innerHTML = /* HTML */ `
 
     #close-dialog-button {
       display: block;
-      padding: 0.1em 0.5em;
+      padding: 0em 0.5em;
       border: none;
       margin-inline-start: auto;
     }
 
-    #modes-container {
-      display: grid;
-      grid-template-columns: auto;
-      gap: 0.5em;
+    .note-sequence-option {
       padding: 0.5em;
-    }
-
-    .mode-option {
-      padding: 0.5em;
-      border: 1px solid #ccc;
-      border-radius: 0.3em;
+      border: 0.1em solid currentColor;
+      border-radius: 0.5em;
       cursor: pointer;
     }
 
-    .mode-option h3 {
-      margin-top: 0;
-      margin-bottom: 0.2em;
+    .note-sequence-option h3 {
+      margin: 0;
     }
 
-    .more-info {
-      text-align: left;
+    #toggle-more-info-label {
       font-size: 0.8em;
-      margin-top: 0.5em;
-      padding: 0.3em;
-      border-top: 1px solid #eee;
+    }
+
+    #toggle-more-info-checkbox {
+      width: 1.5em;
+      height: 1.5em;
+    }
+
+    .more-info-div {
+      font-size: 0.8em;
     }
 
     .hidden {
@@ -89,54 +86,60 @@ modeSelectorTemplate.innerHTML = /* HTML */ `
     }
   </style>
 
-  <button id="mode-selector-button">Select Mode</button>
+  <button id="note-sequence-selector-button">Select Sequence</button>
 
-  <dialog id="mode-selector-dialog">
+  <dialog id="note-sequence-selector-dialog">
     <button id="close-dialog-button">×</button>
-    <label>
-      <input type="checkbox" id="toggle-more-info" />
+    <label id="toggle-more-info-label">
+      <input type="checkbox" id="toggle-more-info-checkbox" />
       More Info
     </label>
-    <div id="modes-container"></div>
+    <div id="note-sequences-container"></div>
   </dialog>
 `;
 
-interface ModeSelectedEventDetail {
-  modeName: DiatonicModeName | null;
-  modeData: NoteSequenceTheme | null;
+interface NoteSequenceSelectedEventDetail {
+  noteSequenceThemeKey: NoteSequenceThemeKey | null;
+  noteSequenceTheme: NoteSequenceTheme | null;
 }
 
-class ModeSelector extends HTMLElement {
+class NoteSequenceSelector extends HTMLElement {
   #shadowRoot: ShadowRoot;
-  #modeSelectorButton: HTMLButtonElement | null = null;
-  #modeSelectorDialog: HTMLDialogElement | null = null;
-  #modesContainer: HTMLDivElement | null = null;
+  #noteSequenceSelectorButton: HTMLButtonElement | null = null;
+  #noteSequenceSelectorDialog: HTMLDialogElement | null = null;
+  #noteSequencesContainer: HTMLDivElement | null = null;
   #toggleMoreInfoCheckbox: HTMLInputElement | null = null;
   #abortController: AbortController | null = null;
-  #selectedModeName: DiatonicModeName | null = null;
-  #selectedModeData: NoteSequenceTheme | null = null;
+  #selectedNoteSequenceThemeKey: NoteSequenceThemeKey | null = null;
+  #selectedNoteSequenceTheme: NoteSequenceTheme | null = null;
 
   static get observedAttributes(): string[] {
-    return ["selected-mode-name"];
+    return ["selected-note-sequence-theme-key"];
   }
 
   constructor() {
     super();
     this.#shadowRoot = this.attachShadow({ mode: "open" });
-    this.#shadowRoot.appendChild(modeSelectorTemplate.content.cloneNode(true));
+    this.#shadowRoot.appendChild(
+      noteSequenceSelectorTemplate.content.cloneNode(true)
+    );
 
-    this.#modeSelectorButton =
+    this.#noteSequenceSelectorButton =
       this.#shadowRoot.querySelector<HTMLButtonElement>(
-        "#mode-selector-button"
+        "#note-sequence-selector-button"
       );
-    this.#modeSelectorDialog =
+    this.#noteSequenceSelectorDialog =
       this.#shadowRoot.querySelector<HTMLDialogElement>(
-        "#mode-selector-dialog"
+        "#note-sequence-selector-dialog"
       );
-    this.#modesContainer =
-      this.#shadowRoot.querySelector<HTMLDivElement>("#modes-container");
+    this.#noteSequencesContainer =
+      this.#shadowRoot.querySelector<HTMLDivElement>(
+        "#note-sequences-container"
+      );
     this.#toggleMoreInfoCheckbox =
-      this.#shadowRoot.querySelector<HTMLInputElement>("#toggle-more-info");
+      this.#shadowRoot.querySelector<HTMLInputElement>(
+        "#toggle-more-info-checkbox"
+      );
   }
 
   connectedCallback() {
@@ -144,15 +147,15 @@ class ModeSelector extends HTMLElement {
     const { signal } = this.#abortController;
 
     if (
-      this.#modeSelectorButton &&
-      this.#modeSelectorDialog &&
-      this.#modesContainer &&
+      this.#noteSequenceSelectorButton &&
+      this.#noteSequenceSelectorDialog &&
+      this.#noteSequencesContainer &&
       this.#toggleMoreInfoCheckbox
     ) {
-      this.#modeSelectorButton.addEventListener(
+      this.#noteSequenceSelectorButton.addEventListener(
         "click",
         () => {
-          this.#modeSelectorDialog!.showModal();
+          this.#noteSequenceSelectorDialog!.showModal();
         },
         { signal }
       );
@@ -163,12 +166,10 @@ class ModeSelector extends HTMLElement {
       closeDialogButton.addEventListener(
         "click",
         () => {
-          this.#modeSelectorDialog!.close();
+          this.#noteSequenceSelectorDialog!.close();
         },
         { signal }
       );
-
-      this.#populateModes();
 
       this.#toggleMoreInfoCheckbox.addEventListener(
         "change",
@@ -178,8 +179,9 @@ class ModeSelector extends HTMLElement {
         { signal }
       );
 
-      this.#updateModeSelectorButtonText();
-      this.#updateSelectedModeAttribute();
+      this.#populateNoteSequences();
+      this.#updateNoteSequenceSelectorButtonText();
+      this.#updateSelectedNoteSequenceAttribute();
     } else {
       console.error("Failed to find necessary elements in the shadow DOM");
     }
@@ -195,107 +197,119 @@ class ModeSelector extends HTMLElement {
     newValue: string | null
   ) {
     if (oldValue === newValue) return;
-    if (name === "selected-mode-name") {
-      this.selectedModeName = newValue as DiatonicModeName | null;
+    if (name === "selected-note-sequence-theme-key") {
+      this.selectedNoteSequenceThemeKey =
+        newValue as NoteSequenceThemeKey | null;
     }
   }
 
-  #populateModes() {
-    if (!this.#modesContainer) return;
-    this.#modesContainer.innerHTML = ""; // Clear existing content
+  #populateNoteSequences() {
+    if (!this.#noteSequencesContainer) return;
+    this.#noteSequencesContainer.replaceChildren();
 
-    for (const modeName in diatonicModes) {
-      const modeData = diatonicModes[modeName as DiatonicModeName];
-      const modeOption = document.createElement("div");
-      modeOption.classList.add("mode-option");
-      modeOption.innerHTML = /* HTML */ ` <h3>${modeData.primaryName}</h3> `;
+    for (const noteSequenceThemeKey in allNoteSequenceThemes) {
+      const noteSequenceTheme =
+        allNoteSequenceThemes[noteSequenceThemeKey as NoteSequenceThemeKey];
+      const noteSequenceOption = document.createElement("div");
+      noteSequenceOption.classList.add("note-sequence-option");
+      noteSequenceOption.innerHTML = /* HTML */ `
+        <h3>${noteSequenceTheme.primaryName}</h3>
+      `;
 
       const moreInfoDiv = document.createElement("div");
-      moreInfoDiv.classList.add("more-info", "hidden"); // Initially hidden
-      moreInfoDiv.innerHTML = this.#renderMoreInfo(modeData);
-      modeOption.appendChild(moreInfoDiv);
+      moreInfoDiv.classList.add("more-info-div", "hidden"); // Initially hidden
+      moreInfoDiv.innerHTML = this.#renderMoreInfo(noteSequenceTheme);
+      noteSequenceOption.appendChild(moreInfoDiv);
 
-      modeOption.addEventListener("click", () => {
-        this.#selectedModeName = modeName as DiatonicModeName;
-        this.#selectedModeData = modeData;
-        this.#updateModeSelectorButtonText();
-        this.#updateSelectedModeAttribute();
-        this.#dispatchModeSelectedEvent();
-        this.#modeSelectorDialog!.close();
+      noteSequenceOption.addEventListener("click", () => {
+        this.#selectedNoteSequenceThemeKey =
+          noteSequenceThemeKey as NoteSequenceThemeKey;
+        this.#selectedNoteSequenceTheme = noteSequenceTheme;
+        this.#updateNoteSequenceSelectorButtonText();
+        this.#updateSelectedNoteSequenceAttribute();
+        this.#dispatchNoteSequenceSelectedEvent();
+        this.#noteSequenceSelectorDialog!.close();
       });
 
-      this.#modesContainer.appendChild(modeOption);
+      this.#noteSequencesContainer.appendChild(noteSequenceOption);
     }
   }
 
-  #renderMoreInfo(modeData: NoteSequenceTheme): string {
+  #renderMoreInfo(noteSequenceTheme: NoteSequenceTheme): string {
     return /* HTML */ `
-      <div><strong>Names:</strong> ${modeData.names.join(", ")}</div>
-      <div><strong>Type:</strong> ${modeData.type.join(", ")}</div>
+      <div>${noteSequenceTheme.names.join(", ")}</div>
+      <div>${noteSequenceTheme.type.join(", ")}</div>
+      <div>${noteSequenceTheme.characteristics.join(", ")}</div>
       <div>
-        <strong>Characteristics:</strong> ${modeData.characteristics.join(", ")}
+        ${noteSequenceTheme.pattern.join("-")}
+        (${noteSequenceTheme.patternShort.join("-")})
       </div>
-      <div>
-        <strong>Pattern:</strong> ${modeData.pattern.join("-")}
-        (${modeData.patternShort.join("-")})
-      </div>
-      <div><strong>Degrees:</strong> ${modeData.degrees.join(", ")}</div>
-      <div>
-        <strong>Example Notes:</strong> ${modeData.exampleNotes.join(", ")}
-      </div>
+      <div>${noteSequenceTheme.degrees.join(", ")}</div>
+      <div>${noteSequenceTheme.exampleNotes.join(", ")}</div>
     `;
   }
 
   #updateMoreInfoVisibility() {
     const moreInfoElements = this.#shadowRoot?.querySelectorAll(
-      ".more-info"
+      ".more-info-div"
     ) as NodeListOf<HTMLDivElement>;
     moreInfoElements.forEach((el) => {
       el.classList.toggle("hidden", !this.#toggleMoreInfoCheckbox!.checked);
     });
   }
 
-  #updateModeSelectorButtonText() {
-    this.#modeSelectorButton!.textContent = this.#selectedModeData
-      ? this.#selectedModeData.primaryName
-      : "Select Mode";
+  #updateNoteSequenceSelectorButtonText() {
+    this.#noteSequenceSelectorButton!.textContent = this
+      .#selectedNoteSequenceTheme
+      ? this.#selectedNoteSequenceTheme.primaryName
+      : "Select Sequence";
   }
 
-  #updateSelectedModeAttribute() {
-    if (this.#selectedModeName) {
-      this.setAttribute("selected-mode-name", this.#selectedModeName);
+  #updateSelectedNoteSequenceAttribute() {
+    if (this.#selectedNoteSequenceThemeKey) {
+      this.setAttribute(
+        "selected-note-sequence-theme-key",
+        this.#selectedNoteSequenceThemeKey
+      );
     } else {
-      this.removeAttribute("selected-mode-name");
+      this.removeAttribute("selected-note-sequence-theme-key");
     }
   }
 
-  #dispatchModeSelectedEvent() {
+  #dispatchNoteSequenceSelectedEvent() {
     this.dispatchEvent(
-      new CustomEvent<ModeSelectedEventDetail>("mode-selected", {
-        detail: {
-          modeName: this.#selectedModeName,
-          modeData: this.#selectedModeData,
-        },
-        bubbles: true,
-        composed: true,
-      })
+      new CustomEvent<NoteSequenceSelectedEventDetail>(
+        "note-sequence-selected",
+        {
+          detail: {
+            noteSequenceThemeKey: this.#selectedNoteSequenceThemeKey,
+            noteSequenceTheme: this.#selectedNoteSequenceTheme,
+          },
+          bubbles: true,
+          composed: true,
+        }
+      )
     );
   }
 
-  get selectedModeName(): DiatonicModeName | null {
-    return this.#selectedModeName;
+  get selectedNoteSequenceThemeKey(): NoteSequenceThemeKey | null {
+    return this.#selectedNoteSequenceThemeKey;
   }
 
-  set selectedModeName(newModeName: DiatonicModeName | null) {
-    this.#selectedModeName = newModeName;
-    this.#selectedModeData = newModeName ? diatonicModes[newModeName] : null;
-    this.#updateModeSelectorButtonText();
-    this.#updateSelectedModeAttribute();
+  set selectedNoteSequenceThemeKey(
+    newNoteSequenceThemeKey: NoteSequenceThemeKey | null
+  ) {
+    this.#selectedNoteSequenceThemeKey = newNoteSequenceThemeKey;
+    this.#selectedNoteSequenceTheme = newNoteSequenceThemeKey
+      ? allNoteSequenceThemes[newNoteSequenceThemeKey]
+      : null;
+    this.#updateNoteSequenceSelectorButtonText();
+    this.#updateSelectedNoteSequenceAttribute();
   }
 
-  get selectedModeData(): NoteSequenceTheme | null {
-    return this.#selectedModeData;
+  get selectedNoteSequenceTheme(): NoteSequenceTheme | null {
+    return this.#selectedNoteSequenceTheme;
   }
 }
 
-customElements.define("mode-selector", ModeSelector);
+customElements.define("note-sequence-selector", NoteSequenceSelector);
