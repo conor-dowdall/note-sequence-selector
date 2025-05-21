@@ -208,79 +208,47 @@ class NoteSequenceSelector extends HTMLElement {
 
   #populateNoteSequences() {
     if (!this.#noteSequencesContainer) return;
+
     this.#noteSequencesContainer.replaceChildren();
 
-    for (const groupKey of Object.keys(
-      noteSequenceThemeGroupsMetadata
-    ) as NoteSequenceThemeGroupKey[]) {
-      const groupMetadata = noteSequenceThemeGroupsMetadata[groupKey];
+    Object.entries(noteSequenceThemeGroupsMetadata).forEach(
+      ([groupKey, groupMetadata]) => {
+        const groupDiv = document.createElement("div");
+        groupDiv.textContent = `${groupMetadata.displayName}`;
 
-      const groupDiv = document.createElement("div");
-      groupDiv.textContent = `${groupMetadata.displayName}`;
+        const groupMoreInfoDiv = document.createElement("div");
+        groupMoreInfoDiv.classList.add("more-info-div", "hidden");
+        groupMoreInfoDiv.textContent = `${groupMetadata.description}`;
+        groupDiv.appendChild(groupMoreInfoDiv);
 
-      const groupMoreInfoDiv = document.createElement("div");
-      groupMoreInfoDiv.classList.add("more-info-div", "hidden");
-      groupMoreInfoDiv.textContent = `${groupMetadata.description}`;
-      groupDiv.appendChild(groupMoreInfoDiv);
+        const currentGroup =
+          noteSequenceThemes[groupKey as NoteSequenceThemeGroupKey];
 
-      const currentGroup = noteSequenceThemes[groupKey];
+        Object.entries(currentGroup).forEach(([key, theme]) => {
+          const noteSequenceDiv = document.createElement("div");
+          noteSequenceDiv.classList.add("note-sequence-option");
+          noteSequenceDiv.textContent = `${theme.primaryName}`;
 
-      for (const currentThemeKey of Object.keys(
-        currentGroup
-      ) as NoteSequenceThemeKey[]) {
-        const currentTheme = allNoteSequenceThemes[currentThemeKey];
+          const themeMoreInfoDiv = document.createElement("div");
+          themeMoreInfoDiv.classList.add("more-info-div", "hidden");
+          themeMoreInfoDiv.innerHTML = this.#renderMoreInfo(theme);
+          noteSequenceDiv.appendChild(themeMoreInfoDiv);
 
-        const noteSequenceDiv = document.createElement("div");
-        noteSequenceDiv.classList.add("note-sequence-option");
-        noteSequenceDiv.textContent = `${currentTheme.primaryName}`;
+          noteSequenceDiv.addEventListener("click", () => {
+            this.#selectedNoteSequenceThemeKey = key as NoteSequenceThemeKey;
+            this.#selectedNoteSequenceTheme = theme;
+            this.#updateNoteSequenceSelectorButtonText();
+            this.#updateSelectedNoteSequenceAttribute();
+            this.#dispatchNoteSequenceSelectedEvent();
+            this.#noteSequenceSelectorDialog!.close();
+          });
 
-        const themeMoreInfoDiv = document.createElement("div");
-        themeMoreInfoDiv.classList.add("more-info-div", "hidden");
-        themeMoreInfoDiv.innerHTML = this.#renderMoreInfo(currentTheme);
-        noteSequenceDiv.appendChild(themeMoreInfoDiv);
-
-        noteSequenceDiv.addEventListener("click", () => {
-          this.#selectedNoteSequenceThemeKey =
-            currentThemeKey as NoteSequenceThemeKey;
-          this.#selectedNoteSequenceTheme = currentTheme;
-          this.#updateNoteSequenceSelectorButtonText();
-          this.#updateSelectedNoteSequenceAttribute();
-          this.#dispatchNoteSequenceSelectedEvent();
-          this.#noteSequenceSelectorDialog!.close();
+          groupDiv.appendChild(noteSequenceDiv);
         });
 
-        groupDiv.appendChild(noteSequenceDiv);
+        this.#noteSequencesContainer!.appendChild(groupDiv);
       }
-
-      this.#noteSequencesContainer.appendChild(groupDiv);
-    }
-
-    // for (const noteSequenceThemeKey in allNoteSequenceThemes) {
-    //   const noteSequenceTheme =
-    //     allNoteSequenceThemes[noteSequenceThemeKey as NoteSequenceThemeKey];
-    //   const noteSequenceOption = document.createElement("div");
-    //   noteSequenceOption.classList.add("note-sequence-option");
-    //   noteSequenceOption.innerHTML = /* HTML */ `
-    //     <h3>${noteSequenceTheme.primaryName}</h3>
-    //   `;
-
-    //   const moreInfoDiv = document.createElement("div");
-    //   moreInfoDiv.classList.add("more-info-div", "hidden");
-    //   moreInfoDiv.textContent = this.#renderMoreInfo(noteSequenceTheme);
-    //   noteSequenceOption.appendChild(moreInfoDiv);
-
-    //   noteSequenceOption.addEventListener("click", () => {
-    //     this.#selectedNoteSequenceThemeKey =
-    //       noteSequenceThemeKey as NoteSequenceThemeKey;
-    //     this.#selectedNoteSequenceTheme = noteSequenceTheme;
-    //     this.#updateNoteSequenceSelectorButtonText();
-    //     this.#updateSelectedNoteSequenceAttribute();
-    //     this.#dispatchNoteSequenceSelectedEvent();
-    //     this.#noteSequenceSelectorDialog!.close();
-    //   });
-
-    //   this.#noteSequencesContainer.appendChild(noteSequenceOption);
-    // }
+    );
   }
 
   #renderMoreInfo(noteSequenceTheme: NoteSequenceTheme): string {
