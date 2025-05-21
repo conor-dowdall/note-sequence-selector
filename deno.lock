@@ -2,7 +2,7 @@
   "version": "5",
   "specifiers": {
     "jsr:@luca/esbuild-deno-loader@~0.11.1": "0.11.1",
-    "jsr:@musodojo/music-theory-data@1": "1.0.0",
+    "jsr:@musodojo/music-theory-data@^1.1.0": "1.1.0",
     "jsr:@std/bytes@^1.0.2": "1.0.6",
     "jsr:@std/encoding@^1.0.5": "1.0.10",
     "jsr:@std/path@^1.0.6": "1.0.9",
@@ -17,8 +17,8 @@
         "jsr:@std/path"
       ]
     },
-    "@musodojo/music-theory-data@1.0.0": {
-      "integrity": "5d0c05d5959b0403e95f8de5c8228c9197494910eebd0583575dc002261f0e21"
+    "@musodojo/music-theory-data@1.1.0": {
+      "integrity": "6174ec2e6c87a77a7980d2943d6b6399a9632a58aa7759ef084af740c584ff90"
     },
     "@std/bytes@1.0.6": {
       "integrity": "f6ac6adbd8ccd99314045f5703e23af0a68d7f7e58364b47d2c7f408aeb5820a"
@@ -192,7 +192,7 @@
   "workspace": {
     "dependencies": [
       "jsr:@luca/esbuild-deno-loader@~0.11.1",
-      "jsr:@musodojo/music-theory-data@1",
+      "jsr:@musodojo/music-theory-data@^1.1.0",
       "npm:esbuild@~0.25.4"
     ]
   }
