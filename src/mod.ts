@@ -46,7 +46,7 @@ noteSequenceSelectorTemplate.innerHTML = /* HTML */ `
     }
 
     dialog {
-      padding: 0em 0.2em 0.2em;
+      padding: 0.5em;
     }
 
     dialog::backdrop {
@@ -55,9 +55,30 @@ noteSequenceSelectorTemplate.innerHTML = /* HTML */ `
 
     #close-dialog-button {
       display: block;
+      font-size: 2em;
       padding: 0em 0.5em;
       border: none;
       margin-inline-start: auto;
+    }
+
+    #note-sequences-container {
+      display: flex;
+      flex-direction: column;
+      gap: 1em;
+      margin-block-start: 2em;
+    }
+
+    #group-wrapper {
+      > h3 {
+        margin: 0em;
+      }
+    }
+
+    #group-note-sequences-wrapper {
+      margin-block: 0.5em;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1em;
     }
 
     .note-sequence-option {
@@ -65,23 +86,21 @@ noteSequenceSelectorTemplate.innerHTML = /* HTML */ `
       border: 0.1em solid currentColor;
       border-radius: 0.5em;
       cursor: pointer;
-    }
 
-    .note-sequence-option h3 {
-      margin: 0;
+      > h4 {
+        margin-block: 0.2em;
+      }
     }
 
     #toggle-more-info-label {
-      font-size: 0.8em;
-    }
-
-    #toggle-more-info-checkbox {
-      width: 1.5em;
-      height: 1.5em;
+      padding: 0.5em;
+      border: 0.1em solid currentColor;
+      border-radius: 0.5em;
+      cursor: pointer;
     }
 
     .more-info-div {
-      font-size: 0.8em;
+      font-size: 0.9em;
     }
 
     .hidden {
@@ -95,7 +114,7 @@ noteSequenceSelectorTemplate.innerHTML = /* HTML */ `
     <button id="close-dialog-button">×</button>
     <label id="toggle-more-info-label">
       <input type="checkbox" id="toggle-more-info-checkbox" />
-      More Info
+      more info
     </label>
     <div id="note-sequences-container"></div>
   </dialog>
@@ -214,12 +233,17 @@ class NoteSequenceSelector extends HTMLElement {
     Object.entries(noteSequenceThemeGroupsMetadata).forEach(
       ([groupKey, groupMetadata]) => {
         const groupDiv = document.createElement("div");
-        groupDiv.textContent = `${groupMetadata.displayName}`;
+        groupDiv.id = "group-wrapper";
+        groupDiv.innerHTML = /* HTML */ `<h3>${groupMetadata.displayName}</h3>`;
 
         const groupMoreInfoDiv = document.createElement("div");
         groupMoreInfoDiv.classList.add("more-info-div", "hidden");
         groupMoreInfoDiv.textContent = `${groupMetadata.description}`;
         groupDiv.appendChild(groupMoreInfoDiv);
+
+        const groupNoteSequencesWrapper = document.createElement("div");
+        groupNoteSequencesWrapper.id = "group-note-sequences-wrapper";
+        groupDiv.appendChild(groupNoteSequencesWrapper);
 
         const currentGroup =
           noteSequenceThemes[groupKey as NoteSequenceThemeGroupKey];
@@ -227,7 +251,9 @@ class NoteSequenceSelector extends HTMLElement {
         Object.entries(currentGroup).forEach(([key, theme]) => {
           const noteSequenceDiv = document.createElement("div");
           noteSequenceDiv.classList.add("note-sequence-option");
-          noteSequenceDiv.textContent = `${theme.primaryName}`;
+          noteSequenceDiv.innerHTML = /* HTML */ `<h4>
+            ${theme.primaryName}
+          </h4>`;
 
           const themeMoreInfoDiv = document.createElement("div");
           themeMoreInfoDiv.classList.add("more-info-div", "hidden");
@@ -243,7 +269,7 @@ class NoteSequenceSelector extends HTMLElement {
             this.#noteSequenceSelectorDialog!.close();
           });
 
-          groupDiv.appendChild(noteSequenceDiv);
+          groupNoteSequencesWrapper.appendChild(noteSequenceDiv);
         });
 
         this.#noteSequencesContainer!.appendChild(groupDiv);
@@ -256,10 +282,8 @@ class NoteSequenceSelector extends HTMLElement {
       <div>${noteSequenceTheme.names.join(", ")}</div>
       <div>${noteSequenceTheme.type.join(", ")}</div>
       <div>${noteSequenceTheme.characteristics.join(", ")}</div>
-      <div>
-        ${noteSequenceTheme.pattern.join("-")}
-        (${noteSequenceTheme.patternShort.join("-")})
-      </div>
+      <div>${noteSequenceTheme.pattern.join("-")}</div>
+      <div>${noteSequenceTheme.patternShort.join("-")}</div>
       <div>${noteSequenceTheme.degrees.join(", ")}</div>
       <div>${noteSequenceTheme.exampleNotes.join(", ")}</div>
     `;
