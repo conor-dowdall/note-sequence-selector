@@ -17,9 +17,12 @@
     ></note-sequence-selector>
     <script type="module" src="../dist/bundle.js"></script>
     <script type="module">
-      document.body.addEventListener("note-sequence-selected", (event) => {
-        console.log("note-sequence selected:", event.detail);
-      });
+      document.body.addEventListener(
+        "note-sequence-selected",
+        (event) => {
+          console.log("note-sequence selected:", event.detail);
+        },
+      );
     </script>
   </body>
 </html>
