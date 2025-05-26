@@ -120,7 +120,7 @@ noteSequenceSelectorTemplate.innerHTML = /* HTML */ `
   </dialog>
 `;
 
-interface NoteSequenceSelectedEventDetail {
+export interface NoteSequenceSelectedEventDetail {
   noteSequenceThemeKey: NoteSequenceThemeKey | null;
   noteSequenceTheme: NoteSequenceTheme | null;
 }
@@ -143,29 +143,25 @@ class NoteSequenceSelector extends HTMLElement {
     super();
     this.#shadowRoot = this.attachShadow({ mode: "open" });
     this.#shadowRoot.appendChild(
-      noteSequenceSelectorTemplate.content.cloneNode(true),
+      noteSequenceSelectorTemplate.content.cloneNode(true)
     );
 
-    this.#noteSequenceSelectorButton = this.#shadowRoot.querySelector<
-      HTMLButtonElement
-    >(
-      "#note-sequence-selector-button",
-    );
-    this.#noteSequenceSelectorDialog = this.#shadowRoot.querySelector<
-      HTMLDialogElement
-    >(
-      "#note-sequence-selector-dialog",
-    );
-    this.#noteSequencesContainer = this.#shadowRoot.querySelector<
-      HTMLDivElement
-    >(
-      "#note-sequences-container",
-    );
-    this.#toggleMoreInfoCheckbox = this.#shadowRoot.querySelector<
-      HTMLInputElement
-    >(
-      "#toggle-more-info-checkbox",
-    );
+    this.#noteSequenceSelectorButton =
+      this.#shadowRoot.querySelector<HTMLButtonElement>(
+        "#note-sequence-selector-button"
+      );
+    this.#noteSequenceSelectorDialog =
+      this.#shadowRoot.querySelector<HTMLDialogElement>(
+        "#note-sequence-selector-dialog"
+      );
+    this.#noteSequencesContainer =
+      this.#shadowRoot.querySelector<HTMLDivElement>(
+        "#note-sequences-container"
+      );
+    this.#toggleMoreInfoCheckbox =
+      this.#shadowRoot.querySelector<HTMLInputElement>(
+        "#toggle-more-info-checkbox"
+      );
   }
 
   connectedCallback() {
@@ -183,18 +179,18 @@ class NoteSequenceSelector extends HTMLElement {
         () => {
           this.#noteSequenceSelectorDialog!.showModal();
         },
-        { signal },
+        { signal }
       );
 
       const closeDialogButton = this.#shadowRoot.getElementById(
-        "close-dialog-button",
+        "close-dialog-button"
       ) as HTMLButtonElement;
       closeDialogButton.addEventListener(
         "click",
         () => {
           this.#noteSequenceSelectorDialog!.close();
         },
-        { signal },
+        { signal }
       );
 
       this.#toggleMoreInfoCheckbox.addEventListener(
@@ -202,7 +198,7 @@ class NoteSequenceSelector extends HTMLElement {
         () => {
           this.#updateMoreInfoVisibility();
         },
-        { signal },
+        { signal }
       );
 
       this.#populateNoteSequences();
@@ -220,13 +216,12 @@ class NoteSequenceSelector extends HTMLElement {
   attributeChangedCallback(
     name: string,
     oldValue: string | null,
-    newValue: string | null,
+    newValue: string | null
   ) {
     if (oldValue === newValue) return;
     if (name === "selected-note-sequence-theme-key") {
-      this.selectedNoteSequenceThemeKey = newValue as
-        | NoteSequenceThemeKey
-        | null;
+      this.selectedNoteSequenceThemeKey =
+        newValue as NoteSequenceThemeKey | null;
     }
   }
 
@@ -278,7 +273,7 @@ class NoteSequenceSelector extends HTMLElement {
         });
 
         this.#noteSequencesContainer!.appendChild(groupDiv);
-      },
+      }
     );
   }
 
@@ -296,7 +291,7 @@ class NoteSequenceSelector extends HTMLElement {
 
   #updateMoreInfoVisibility() {
     const moreInfoElements = this.#shadowRoot?.querySelectorAll(
-      ".more-info-div",
+      ".more-info-div"
     ) as NodeListOf<HTMLDivElement>;
     moreInfoElements.forEach((el) => {
       el.classList.toggle("hidden", !this.#toggleMoreInfoCheckbox!.checked);
@@ -305,7 +300,7 @@ class NoteSequenceSelector extends HTMLElement {
 
   #updateNoteSequenceSelectorButtonText() {
     this.#noteSequenceSelectorButton!.textContent = this
-        .#selectedNoteSequenceTheme
+      .#selectedNoteSequenceTheme
       ? this.#selectedNoteSequenceTheme.primaryName
       : "Select Sequence";
   }
@@ -314,7 +309,7 @@ class NoteSequenceSelector extends HTMLElement {
     if (this.#selectedNoteSequenceThemeKey) {
       this.setAttribute(
         "selected-note-sequence-theme-key",
-        this.#selectedNoteSequenceThemeKey,
+        this.#selectedNoteSequenceThemeKey
       );
     } else {
       this.removeAttribute("selected-note-sequence-theme-key");
@@ -332,8 +327,8 @@ class NoteSequenceSelector extends HTMLElement {
           },
           bubbles: true,
           composed: true,
-        },
-      ),
+        }
+      )
     );
   }
 
@@ -342,7 +337,7 @@ class NoteSequenceSelector extends HTMLElement {
   }
 
   set selectedNoteSequenceThemeKey(
-    newNoteSequenceThemeKey: NoteSequenceThemeKey | null,
+    newNoteSequenceThemeKey: NoteSequenceThemeKey | null
   ) {
     this.#selectedNoteSequenceThemeKey = newNoteSequenceThemeKey;
     this.#selectedNoteSequenceTheme = newNoteSequenceThemeKey
