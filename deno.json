@@ -1,6 +1,6 @@
 {
   "name": "@musodojo/note-sequence-selector",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "license": "unlicense",
   "exports": "./src/mod.ts",
   "imports": {
