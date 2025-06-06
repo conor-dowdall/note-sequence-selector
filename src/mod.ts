@@ -36,13 +36,14 @@ noteSequenceSelectorTemplate.innerHTML = /* HTML */ `
       cursor: pointer;
       background: none;
       border-radius: 0.5em;
-      border-width: 0.1em;
+      border-width: 0.05em;
       border-style: solid;
       border-color: currentColor;
     }
 
     #note-sequence-selector-button {
-      padding-inline: 0.5em;
+      min-width: 4ch;
+      padding-inline: 1ch;
     }
 
     dialog {
@@ -83,13 +84,19 @@ noteSequenceSelectorTemplate.innerHTML = /* HTML */ `
 
     .note-sequence-option {
       padding: 0.5em;
+      min-width: 4ch;
       border: 0.1em solid currentColor;
       border-radius: 0.5em;
       cursor: pointer;
+      text-align: left;
 
       > h4 {
         margin-block: 0.2em;
       }
+    }
+
+    .note-sequence-option:has(> .more-info-div.hidden) {
+      text-align: center;
     }
 
     #toggle-more-info-label {
@@ -97,10 +104,6 @@ noteSequenceSelectorTemplate.innerHTML = /* HTML */ `
       border: 0.1em solid currentColor;
       border-radius: 0.5em;
       cursor: pointer;
-    }
-
-    .more-info-div {
-      font-size: 0.9em;
     }
 
     .hidden {
