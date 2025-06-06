@@ -1,12 +1,12 @@
 {
   "name": "@musodojo/note-sequence-selector",
-  "version": "0.3.1",
+  "version": "0.3.2",
   "license": "unlicense",
   "exports": "./src/mod.ts",
   "imports": {
     "@luca/esbuild-deno-loader": "jsr:@luca/esbuild-deno-loader@^0.11.1",
     "@musodojo/music-theory-data": "jsr:@musodojo/music-theory-data@^1.1.0",
-    "esbuild": "npm:esbuild@^0.25.4"
+    "esbuild": "npm:esbuild@^0.25.5"
   },
   "compilerOptions": {
     "lib": ["dom", "dom.iterable", "dom.asynciterable", "deno.ns"]
