@@ -1,33 +1,11 @@
 {
   "version": "5",
   "specifiers": {
-    "jsr:@luca/esbuild-deno-loader@~0.11.1": "0.11.1",
-    "jsr:@musodojo/music-theory-data@^1.1.0": "1.1.0",
-    "jsr:@std/bytes@^1.0.2": "1.0.6",
-    "jsr:@std/encoding@^1.0.5": "1.0.10",
-    "jsr:@std/path@^1.0.6": "1.0.9",
-    "npm:esbuild@~0.25.5": "0.25.5"
+    "jsr:@musodojo/music-theory-data@2": "2.0.0"
   },
   "jsr": {
-    "@luca/esbuild-deno-loader@0.11.1": {
-      "integrity": "dc020d16d75b591f679f6b9288b10f38bdb4f24345edb2f5732affa1d9885267",
-      "dependencies": [
-        "jsr:@std/bytes",
-        "jsr:@std/encoding",
-        "jsr:@std/path"
-      ]
-    },
-    "@musodojo/music-theory-data@1.1.0": {
-      "integrity": "6174ec2e6c87a77a7980d2943d6b6399a9632a58aa7759ef084af740c584ff90"
-    },
-    "@std/bytes@1.0.6": {
-      "integrity": "f6ac6adbd8ccd99314045f5703e23af0a68d7f7e58364b47d2c7f408aeb5820a"
-    },
-    "@std/encoding@1.0.10": {
-      "integrity": "8783c6384a2d13abd5e9e87a7ae0520a30e9f56aeeaa3bdf910a3eaaf5c811a1"
-    },
-    "@std/path@1.0.9": {
-      "integrity": "260a49f11edd3db93dd38350bf9cd1b4d1366afa98e81b86167b4e3dd750129e"
+    "@musodojo/music-theory-data@2.0.0": {
+      "integrity": "3b1e02a2224d95e57234b53841aa644869d11e0942086d1d54afa9453ed0793b"
     }
   },
   "npm": {
@@ -280,45 +258,11 @@
       "integrity": "sha512-TXv6YnJ8ZMVdX+SXWVBo/0p8LTcrUYngpWjvm91TMjjBQii7Oz11Lw5lbDV5Y0TzuhSJHwiH4hEtC1I42mMS0g==",
       "os": ["win32"],
       "cpu": ["x64"]
-    },
-    "esbuild@0.25.5": {
-      "integrity": "sha512-P8OtKZRv/5J5hhz0cUAdu/cLuPIKXpQl1R9pZtvmHWQvrAUVd0UNIPT4IB4W3rNOqVO0rlqHmCIbSwxh/c9yUQ==",
-      "optionalDependencies": [
-        "@esbuild/aix-ppc64@0.25.5",
-        "@esbuild/android-arm@0.25.5",
-        "@esbuild/android-arm64@0.25.5",
-        "@esbuild/android-x64@0.25.5",
-        "@esbuild/darwin-arm64@0.25.5",
-        "@esbuild/darwin-x64@0.25.5",
-        "@esbuild/freebsd-arm64@0.25.5",
-        "@esbuild/freebsd-x64@0.25.5",
-        "@esbuild/linux-arm@0.25.5",
-        "@esbuild/linux-arm64@0.25.5",
-        "@esbuild/linux-ia32@0.25.5",
-        "@esbuild/linux-loong64@0.25.5",
-        "@esbuild/linux-mips64el@0.25.5",
-        "@esbuild/linux-ppc64@0.25.5",
-        "@esbuild/linux-riscv64@0.25.5",
-        "@esbuild/linux-s390x@0.25.5",
-        "@esbuild/linux-x64@0.25.5",
-        "@esbuild/netbsd-arm64@0.25.5",
-        "@esbuild/netbsd-x64@0.25.5",
-        "@esbuild/openbsd-arm64@0.25.5",
-        "@esbuild/openbsd-x64@0.25.5",
-        "@esbuild/sunos-x64@0.25.5",
-        "@esbuild/win32-arm64@0.25.5",
-        "@esbuild/win32-ia32@0.25.5",
-        "@esbuild/win32-x64@0.25.5"
-      ],
-      "scripts": true,
-      "bin": true
     }
   },
   "workspace": {
     "dependencies": [
-      "jsr:@luca/esbuild-deno-loader@~0.11.1",
-      "jsr:@musodojo/music-theory-data@^1.1.0",
-      "npm:esbuild@~0.25.5"
+      "jsr:@musodojo/music-theory-data@2"
     ]
   }
 }
