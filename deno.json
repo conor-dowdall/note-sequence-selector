@@ -1,0 +1,16 @@
+{
+  "name": "@musodojo/note-sequence-selector",
+  "version": "3.0.0",
+  "license": "unlicense",
+  "exports": "./src/mod.ts",
+  "imports": {
+    "@musodojo/music-theory-data": "jsr:@musodojo/music-theory-data@^1.1.0"
+  },
+  "compilerOptions": {
+    "lib": ["dom", "dom.iterable", "dom.asynciterable", "deno.ns"]
+  },
+  "tasks": {
+    "bundle": "deno bundle --minify --platform browser -o dist/bundle.js src/mod.ts",
+    "devbundle": "deno bundle --watch --sourcemap --minify --platform browser -o dist/bundle.js src/mod.ts"
+  }
+}
