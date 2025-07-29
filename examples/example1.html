@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Note Sequence Selector Example</title>
+    <style>
+      :root {
+        color-scheme: dark light;
+        font-family:
+          system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+          Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue",
+          sans-serif;
+      }
+
+      note-sequence-selector {
+        --note-sequence-selector-padding: 0.3em 1em;
+        border: 1px solid currentColor;
+        border-radius: 0.7em;
+        &:hover {
+          background-color: color-mix(
+            in srgb,
+            currentColor 20%,
+            transparent 80%
+          );
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <h2>Select a Note Sequence</h2>
+    <note-sequence-selector
+      selected-note-sequence-theme-key="ionian"
+    ></note-sequence-selector>
+    <br />
+    <br />
+    <button id="random-button">Random Sequence</button>
+
+    <script type="module" src="../dist/bundle.js"></script>
+    <script type="module">
+      document.body.addEventListener(
+        "note-sequence-selected",
+        (event) => {
+          console.log("note-sequence selected:", event.detail);
+        },
+      );
+      const noteSequenceSelector = document.querySelector(
+        "note-sequence-selector",
+      );
+      const randomButton = document.getElementById("random-button");
+      randomButton.addEventListener("click", () => {
+        noteSequenceSelector.setRandomNoteSequence();
+      });
+    </script>
+  </body>
+</html>
